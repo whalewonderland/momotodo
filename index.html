@@ -9,11 +9,16 @@
 <body class="bg-slate-100 min-h-screen p-3 text-slate-800">
   <div class="max-w-md mx-auto space-y-2.5">
     
-    <!-- ポイント＆ご褒美ヘッダー (コンパクト化) -->
+    <!-- ポイント＆ご褒美ヘッダー -->
     <div class="bg-gradient-to-r from-amber-500 to-red-500 rounded-xl p-3 text-white shadow-md">
       <div class="flex justify-between items-center mb-1">
         <span class="font-bold text-[10px] tracking-wider uppercase opacity-90">獲得討伐pt</span>
-        <span id="score" class="text-2xl font-black">0 pt</span>
+        <div class="flex items-center gap-2">
+          <button onclick="openHistoryModal()" class="bg-black/20 hover:bg-black/30 text-white font-bold text-[10px] px-2 py-1 rounded-lg border border-white/20 transition">
+            🏆 討伐リスト
+          </button>
+          <span id="score" class="text-2xl font-black">0 pt</span>
+        </div>
       </div>
       <div class="w-full bg-black/20 rounded-full h-2 overflow-hidden p-0.5">
         <div id="progress" class="bg-yellow-300 h-full rounded-full transition-all duration-500" style="width: 0%"></div>
@@ -21,7 +26,7 @@
       <p id="reward-msg" class="text-[10px] text-right mt-1 font-bold text-yellow-100">次のご褒美まであと 100pt</p>
     </div>
 
-    <!-- 入力フォーム (折りたたみ可能 & コンパクト配置) -->
+    <!-- 入力フォーム (折りたたみ可能) -->
     <details id="form-details" open class="bg-white rounded-xl p-3 shadow-sm transition-all">
       <summary class="font-bold text-xs flex items-center justify-between cursor-pointer select-none text-slate-700">
         <span>⚔️ クエストを発行する</span>
@@ -84,9 +89,35 @@
 
   </div>
 
+  <!-- 討伐リスト モーダル画面 -->
+  <div id="history-modal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm hidden flex items-center justify-center p-4 z-50">
+    <div class="bg-white rounded-2xl w-full max-w-md max-h-[80vh] flex flex-col shadow-xl overflow-hidden">
+      <div class="p-3 border-b flex justify-between items-center bg-slate-50">
+        <h3 class="font-bold text-xs text-slate-700 flex items-center gap-1">
+          <span>🏆</span> 今日の討伐リスト
+        </h3>
+        <button onclick="closeHistoryModal()" class="text-slate-400 text-base font-bold px-2">✕</button>
+      </div>
+      
+      <div id="history-list" class="p-3 overflow-y-auto space-y-1.5 flex-1">
+        <!-- ここに討伐済みタスクを表示 -->
+      </div>
+
+      <div class="p-3 border-t bg-slate-50 flex justify-between items-center">
+        <button onclick="resetHistory()" class="text-[11px] text-red-500 hover:text-red-700 font-bold px-2 py-1 rounded border border-red-200 bg-red-50">
+          リストをリセット
+        </button>
+        <button onclick="closeHistoryModal()" class="bg-slate-800 text-white text-xs font-bold px-4 py-1.5 rounded-lg">
+          閉じる
+        </button>
+      </div>
+    </div>
+  </div>
+
   <script>
     let score = Number(localStorage.getItem('todo_score') || 0);
     let tasks = JSON.parse(localStorage.getItem('todo_tasks') || '[]');
+    let history = JSON.parse(localStorage.getItem('todo_history') || '[]');
 
     const levelData = {
       1: { label: 'Lv.1 イフリート', color: 'border-emerald-400', badge: 'bg-emerald-50 text-emerald-700' },
@@ -133,9 +164,10 @@
               <span class="text-[9px] px-1.5 py-0.2 rounded font-medium ${lvl.badge}">${lvl.label}</span>
               <span class="text-[10px] text-slate-400 font-medium">⏱${t.time}分</span>
             </div>
-            <p onclick="editTitle(${index})" title="タップで内容を修正" class="font-bold text-xs text-slate-800 truncate cursor-pointer hover:text-amber-600 transition">
-              ${t.title} <span class="text-[10px] text-slate-300 font-normal">✏️</span>
-            </p>
+            <div class="flex items-center gap-1">
+              <p class="font-bold text-xs text-slate-800 truncate">${t.title}</p>
+              <button onclick="editTitle(${index})" title="内容を修正" class="text-[10px] text-slate-400 hover:text-amber-600 shrink-0">✏️</button>
+            </div>
           </div>
           <div class="flex items-center gap-1.5 shrink-0 ml-2">
             <button onclick="cancelTask(${index})" class="text-[10px] text-slate-400 hover:text-red-500 font-medium px-1 py-1 transition">
@@ -151,6 +183,7 @@
 
       localStorage.setItem('todo_score', score);
       localStorage.setItem('todo_tasks', JSON.stringify(tasks));
+      localStorage.setItem('todo_history', JSON.stringify(history));
     }
 
     function addTask() {
@@ -165,26 +198,29 @@
       tasks.push({ title, time, cat, level });
       titleEl.value = '';
       
-      // クエスト追加後は入力をたたんでタスク一覧を見やすくする
       document.getElementById('form-details').removeAttribute('open');
-      
       updateUI();
     }
 
-    // ① 内容（タイトル）の修正
+    // クエスト内容（タイトル）の修正
     function editTitle(index) {
       const t = tasks[index];
-      const newTitle = prompt('クエストの内容を修正:', t.title);
-      if (newTitle !== null && newTitle.trim() !== '') {
-        tasks[index].title = newTitle.trim();
-        updateUI();
+      const newTitle = window.prompt('クエストの内容を修正してください:', t.title);
+      if (newTitle !== null) {
+        const trimmed = newTitle.trim();
+        if (trimmed !== '') {
+          tasks[index].title = trimmed;
+          updateUI();
+        } else {
+          alert('内容を入力してください。');
+        }
       }
     }
 
-    // ② カテゴリの修正
+    // カテゴリの修正
     function editCategory(index) {
       const t = tasks[index];
-      const newCat = prompt('カテゴリを変更（仕事 / 家 / 自分）:', t.cat);
+      const newCat = window.prompt('カテゴリを変更（仕事 / 家 / 自分）:', t.cat);
       if (newCat && ['仕事', '家', '自分'].includes(newCat.trim())) {
         tasks[index].cat = newCat.trim();
         updateUI();
@@ -193,7 +229,7 @@
       }
     }
 
-    // ③ 辞退処理（確認ポップアップ ＆ 10%違約金マイナス）
+    // 辞退処理（確認ポップアップ ＆ 10%違約金マイナス）
     function cancelTask(index) {
       const t = tasks[index];
       const rewardPts = t.time * t.level;
@@ -211,16 +247,68 @@
       }
     }
 
-    // ④ 撃破（完了）処理
+    // 撃破（完了）処理
     function completeTask(index) {
       const t = tasks[index];
       const pts = t.time * t.level;
       score += pts;
       
+      // 討伐履歴に追加
+      const now = new Date();
+      const timeStr = `${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}`;
+      history.unshift({
+        title: t.title,
+        cat: t.cat,
+        pts: pts,
+        completedAt: timeStr
+      });
+
       alert(`⚔️ モンスター撃破！\n${pts} pt 獲得しました！`);
       
       tasks.splice(index, 1);
       updateUI();
+    }
+
+    // 討伐リスト モーダルの開閉
+    function openHistoryModal() {
+      const modal = document.getElementById('history-modal');
+      const listEl = document.getElementById('history-list');
+      listEl.innerHTML = '';
+
+      if (history.length === 0) {
+        listEl.innerHTML = '<p class="text-center text-xs text-slate-400 py-6">今日の討伐履歴はありません</p>';
+      } else {
+        history.forEach((h) => {
+          const item = document.createElement('div');
+          item.className = 'bg-slate-50 border border-slate-100 rounded-lg p-2 flex justify-between items-center text-xs';
+          item.innerHTML = `
+            <div class="space-y-0.5">
+              <div class="flex items-center gap-1.5">
+                <span class="text-[9px] px-1.5 py-0.2 rounded font-bold bg-slate-200 text-slate-700">${h.cat}</span>
+                <span class="text-[10px] text-slate-400">${h.completedAt} 撃破</span>
+              </div>
+              <p class="font-bold text-slate-800">${h.title}</p>
+            </div>
+            <span class="font-black text-amber-600 text-xs shrink-0 ml-2">+${h.pts} pt</span>
+          `;
+          listEl.appendChild(item);
+        });
+      }
+
+      modal.classList.remove('hidden');
+    }
+
+    function closeHistoryModal() {
+      document.getElementById('history-modal').classList.add('hidden');
+    }
+
+    // 討伐リストのリセット
+    function resetHistory() {
+      if (window.confirm('討伐リスト（履歴）をクリアしますか？\n※獲得ポイントはそのまま維持されます。')) {
+        history = [];
+        localStorage.setItem('todo_history', JSON.stringify(history));
+        openHistoryModal();
+      }
     }
 
     // 初期表示
