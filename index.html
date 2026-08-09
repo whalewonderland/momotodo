@@ -2,76 +2,82 @@
 <html lang="ja">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>クエストTODO</title>
   <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body class="bg-slate-100 min-h-screen p-4 text-slate-800">
-  <div class="max-w-md mx-auto space-y-4">
+<body class="bg-slate-100 min-h-screen p-3 text-slate-800">
+  <div class="max-w-md mx-auto space-y-2.5">
     
-    <!-- ポイント＆ご褒美ヘッダー -->
-    <div class="bg-gradient-to-r from-amber-500 to-red-500 rounded-2xl p-4 text-white shadow-lg">
+    <!-- ポイント＆ご褒美ヘッダー (コンパクト化) -->
+    <div class="bg-gradient-to-r from-amber-500 to-red-500 rounded-xl p-3 text-white shadow-md">
       <div class="flex justify-between items-center mb-1">
-        <span class="font-bold text-xs tracking-wider uppercase opacity-90">獲得討伐pt</span>
-        <span id="score" class="text-3xl font-black">0 pt</span>
+        <span class="font-bold text-[10px] tracking-wider uppercase opacity-90">獲得討伐pt</span>
+        <span id="score" class="text-2xl font-black">0 pt</span>
       </div>
-      <div class="w-full bg-black/20 rounded-full h-3 overflow-hidden p-0.5">
+      <div class="w-full bg-black/20 rounded-full h-2 overflow-hidden p-0.5">
         <div id="progress" class="bg-yellow-300 h-full rounded-full transition-all duration-500" style="width: 0%"></div>
       </div>
-      <p id="reward-msg" class="text-xs text-right mt-1.5 font-bold text-yellow-100">次のご褒美（100pt）まであと 100pt</p>
+      <p id="reward-msg" class="text-[10px] text-right mt-1 font-bold text-yellow-100">次のご褒美まであと 100pt</p>
     </div>
 
-    <!-- 入力フォーム -->
-    <div class="bg-white rounded-2xl p-4 shadow-sm space-y-3">
-      <h2 class="font-bold text-base border-b pb-2 flex items-center gap-2">
-        <span>⚔️</span> クエストを発行（タスク追加）
-      </h2>
+    <!-- 入力フォーム (折りたたみ可能 & コンパクト配置) -->
+    <details id="form-details" open class="bg-white rounded-xl p-3 shadow-sm transition-all">
+      <summary class="font-bold text-xs flex items-center justify-between cursor-pointer select-none text-slate-700">
+        <span>⚔️ クエストを発行する</span>
+        <span class="text-[10px] text-slate-400 font-normal">タップで開閉</span>
+      </summary>
       
-      <div>
-        <label class="text-xs font-bold text-slate-500">内容</label>
-        <input id="task-title" type="text" placeholder="例: 経費精算の書類を提出する" class="w-full border rounded-lg p-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-amber-400">
-      </div>
-
-      <div class="grid grid-cols-2 gap-2">
+      <div class="space-y-2 mt-2 pt-2 border-t border-slate-100">
         <div>
-          <label class="text-xs font-bold text-slate-500">見込み時間</label>
-          <select id="task-time" class="w-full border rounded-lg p-2.5 text-sm bg-white">
-            <option value="15">15分</option>
-            <option value="30" selected>30分</option>
-            <option value="60">60分</option>
-            <option value="90">90分</option>
-          </select>
+          <input id="task-title" type="text" placeholder="クエスト内容 (例: 経費精算)" class="w-full border rounded-lg p-2 text-xs focus:outline-none focus:ring-1 focus:ring-amber-400">
         </div>
-        <div>
-          <label class="text-xs font-bold text-slate-500">カテゴリ</label>
-          <select id="task-cat" class="w-full border rounded-lg p-2.5 text-sm bg-white">
-            <option value="仕事">💼 仕事</option>
-            <option value="家">🏠 家</option>
-            <option value="自分">👤 自分</option>
-          </select>
+
+        <div class="grid grid-cols-3 gap-1.5">
+          <div>
+            <label class="text-[10px] font-bold text-slate-400 block mb-0.5">時間</label>
+            <select id="task-time" class="w-full border rounded-md p-1.5 text-xs bg-white">
+              <option value="1">1分</option>
+              <option value="5">5分</option>
+              <option value="15">15分</option>
+              <option value="30" selected>30分</option>
+              <option value="60">60分</option>
+              <option value="90">90分</option>
+            </select>
+          </div>
+          <div>
+            <label class="text-[10px] font-bold text-slate-400 block mb-0.5">カテゴリ</label>
+            <select id="task-cat" class="w-full border rounded-md p-1.5 text-xs bg-white">
+              <option value="仕事">💼 仕事</option>
+              <option value="家">🏠 家</option>
+              <option value="自分">👤 自分</option>
+            </select>
+          </div>
+          <div>
+            <label class="text-[10px] font-bold text-slate-400 block mb-0.5">難易度</label>
+            <select id="task-level" class="w-full border rounded-md p-1.5 text-xs bg-white font-medium">
+              <option value="1">Lv.1 イフリート (x1)</option>
+              <option value="2">Lv.2 カマイタチ (x2)</option>
+              <option value="3" selected>Lv.3 フェニックス (x3)</option>
+              <option value="4">Lv.4 アメミット (x4)</option>
+              <option value="5">Lv.5 アザゼル (x5)</option>
+            </select>
+          </div>
         </div>
-      </div>
 
-      <div>
-        <label class="text-xs font-bold text-slate-500">敵の強さ（討伐難易度）</label>
-        <select id="task-level" class="w-full border rounded-lg p-2.5 text-sm bg-white font-medium">
-          <option value="1">🟢 Lv.1 イフリート級 (x1pt)</option>
-          <option value="2">🔵 Lv.2 カマイタチ級 (x2pt)</option>
-          <option value="3" selected>🟡 Lv.3 フェニックス級 (x3pt)</option>
-          <option value="4">🟠 Lv.4 アメミット級 (x4pt)</option>
-          <option value="5">🔴 Lv.5 アザゼル級 (x5pt)</option>
-        </select>
+        <button onclick="addTask()" class="w-full bg-slate-900 hover:bg-slate-800 text-white font-bold py-2 rounded-lg text-xs shadow active:scale-95 transition">
+          受注する
+        </button>
       </div>
-
-      <button onclick="addTask()" class="w-full bg-slate-900 hover:bg-slate-800 text-white font-bold py-3 rounded-xl shadow active:scale-95 transition mt-2">
-        クエストを受注する
-      </button>
-    </div>
+    </details>
 
     <!-- タスク一覧 -->
-    <div class="space-y-2">
-      <h2 class="font-bold text-xs text-slate-500 tracking-wider uppercase">討伐対象のモンスター一覧</h2>
-      <div id="task-list" class="space-y-2">
+    <div class="space-y-1.5">
+      <div class="flex justify-between items-center px-0.5">
+        <h2 class="font-bold text-[10px] text-slate-400 tracking-wider uppercase">討伐対象モンスター</h2>
+        <span id="task-count" class="text-[10px] text-slate-400 font-bold">0件</span>
+      </div>
+      <div id="task-list" class="space-y-1.5">
         <!-- ここに動的追加 -->
       </div>
     </div>
@@ -83,11 +89,11 @@
     let tasks = JSON.parse(localStorage.getItem('todo_tasks') || '[]');
 
     const levelData = {
-      1: { label: 'Lv.1 イフリート級', color: 'border-emerald-400', badge: 'bg-emerald-100 text-emerald-700' },
-      2: { label: 'Lv.2 カマイタチ級', color: 'border-sky-400', badge: 'bg-sky-100 text-sky-700' },
-      3: { label: 'Lv.3 フェニックス級', color: 'border-amber-400', badge: 'bg-amber-100 text-amber-700' },
-      4: { label: 'Lv.4 アメミット級', color: 'border-orange-500', badge: 'bg-orange-100 text-orange-700' },
-      5: { label: 'Lv.5 アザゼル級', color: 'border-red-600', badge: 'bg-red-100 text-red-700 font-bold' }
+      1: { label: 'Lv.1 イフリート', color: 'border-emerald-400', badge: 'bg-emerald-50 text-emerald-700' },
+      2: { label: 'Lv.2 カマイタチ', color: 'border-sky-400', badge: 'bg-sky-50 text-sky-700' },
+      3: { label: 'Lv.3 フェニックス', color: 'border-amber-400', badge: 'bg-amber-50 text-amber-700' },
+      4: { label: 'Lv.4 アメミット', color: 'border-orange-500', badge: 'bg-orange-50 text-orange-700' },
+      5: { label: 'Lv.5 アザゼル', color: 'border-red-600', badge: 'bg-red-50 text-red-700 font-bold' }
     };
 
     function updateUI() {
@@ -98,14 +104,15 @@
       document.getElementById('progress').style.width = `${progressPercent}%`;
       
       const remain = target - (score % target);
-      document.getElementById('reward-msg').innerText = `次のご褒美（100pt）まであと ${remain}pt`;
+      document.getElementById('reward-msg').innerText = `次のご褒美まであと ${remain}pt`;
 
       // タスク一覧
       const listEl = document.getElementById('task-list');
       listEl.innerHTML = '';
+      document.getElementById('task-count').innerText = `${tasks.length}件`;
       
       if(tasks.length === 0) {
-        listEl.innerHTML = '<p class="text-center text-xs text-slate-400 py-6">現在出現しているモンスターはいません🎉</p>';
+        listEl.innerHTML = '<p class="text-center text-xs text-slate-400 py-4">現在出現しているモンスターはいません🎉</p>';
         return;
       }
 
@@ -115,25 +122,27 @@
         const pts = t.time * t.level;
         
         const card = document.createElement('div');
-        card.className = `bg-white rounded-xl p-3.5 shadow-sm flex items-center justify-between border-l-4 ${lvl.color}`;
+        card.className = `bg-white rounded-lg px-2.5 py-2 shadow-sm flex items-center justify-between border-l-4 ${lvl.color}`;
         
         card.innerHTML = `
-          <div class="space-y-1.5 pr-2 flex-1">
-            <div class="flex items-center gap-1.5 flex-wrap">
-              <span onclick="editCategory(${index})" title="タップしてカテゴリを変更" class="text-[10px] px-2 py-0.5 rounded-full font-bold cursor-pointer hover:opacity-80 transition ${catColor}">
-                ${t.cat} ✏️
+          <div class="space-y-0.5 pr-1 flex-1 min-w-0">
+            <div class="flex items-center gap-1">
+              <span onclick="editCategory(${index})" title="タップでカテゴリ変更" class="text-[9px] px-1.5 py-0.2 rounded font-bold cursor-pointer hover:opacity-80 ${catColor}">
+                ${t.cat}
               </span>
-              <span class="text-[10px] px-2 py-0.5 rounded-full font-medium ${lvl.badge}">${lvl.label}</span>
-              <span class="text-[11px] text-slate-400 font-medium">⏱ ${t.time}分</span>
+              <span class="text-[9px] px-1.5 py-0.2 rounded font-medium ${lvl.badge}">${lvl.label}</span>
+              <span class="text-[10px] text-slate-400 font-medium">⏱${t.time}分</span>
             </div>
-            <p class="font-bold text-sm text-slate-800">${t.title}</p>
+            <p onclick="editTitle(${index})" title="タップで内容を修正" class="font-bold text-xs text-slate-800 truncate cursor-pointer hover:text-amber-600 transition">
+              ${t.title} <span class="text-[10px] text-slate-300 font-normal">✏️</span>
+            </p>
           </div>
-          <div class="flex items-center gap-2 shrink-0">
-            <button onclick="cancelTask(${index})" class="text-xs text-slate-400 hover:text-red-500 p-1 transition" title="クエスト辞退">
+          <div class="flex items-center gap-1.5 shrink-0 ml-2">
+            <button onclick="cancelTask(${index})" class="text-[10px] text-slate-400 hover:text-red-500 font-medium px-1 py-1 transition">
               辞退
             </button>
-            <button onclick="completeTask(${index})" class="bg-amber-400 hover:bg-amber-500 text-slate-900 font-black text-xs px-3.5 py-2.5 rounded-xl shadow-sm active:scale-95 transition">
-              撃破!<br><span class="text-[10px] opacity-80">+${pts}pt</span>
+            <button onclick="completeTask(${index})" class="bg-amber-400 hover:bg-amber-500 text-slate-900 font-black text-xs px-2.5 py-1.5 rounded-lg shadow-sm active:scale-95 transition leading-tight">
+              撃破<br><span class="text-[9px] font-normal opacity-80">+${pts}pt</span>
             </button>
           </div>
         `;
@@ -145,22 +154,37 @@
     }
 
     function addTask() {
-      const title = document.getElementById('task-title').value.trim();
-      if(!title) return alert('クエストの内容を入力してください');
+      const titleEl = document.getElementById('task-title');
+      const title = titleEl.value.trim();
+      if(!title) return alert('クエスト内容を入力してください');
       
       const time = Number(document.getElementById('task-time').value);
       const cat = document.getElementById('task-cat').value;
       const level = Number(document.getElementById('task-level').value);
 
       tasks.push({ title, time, cat, level });
-      document.getElementById('task-title').value = '';
+      titleEl.value = '';
+      
+      // クエスト追加後は入力をたたんでタスク一覧を見やすくする
+      document.getElementById('form-details').removeAttribute('open');
+      
       updateUI();
     }
 
+    // ① 内容（タイトル）の修正
+    function editTitle(index) {
+      const t = tasks[index];
+      const newTitle = prompt('クエストの内容を修正:', t.title);
+      if (newTitle !== null && newTitle.trim() !== '') {
+        tasks[index].title = newTitle.trim();
+        updateUI();
+      }
+    }
+
+    // ② カテゴリの修正
     function editCategory(index) {
       const t = tasks[index];
-      const newCat = prompt(`カテゴリを変更しますか？\n（仕事 / 家 / 自分）`, t.cat);
-      
+      const newCat = prompt('カテゴリを変更（仕事 / 家 / 自分）:', t.cat);
       if (newCat && ['仕事', '家', '自分'].includes(newCat.trim())) {
         tasks[index].cat = newCat.trim();
         updateUI();
@@ -169,21 +193,25 @@
       }
     }
 
+    // ③ 辞退処理（確認ポップアップ ＆ 10%違約金マイナス）
     function cancelTask(index) {
       const t = tasks[index];
       const rewardPts = t.time * t.level;
       const penalty = Math.floor(rewardPts * 0.1); // 10%違約金 (切り捨て)
 
-      const confirmMsg = `【クエスト辞退の確認】\n「${t.title}」を辞退しますか？\n\n⚠️ 違約金として ${penalty} pt がマイナスされます。よろしいですか？`;
+      const isConfirmed = window.confirm(
+        `【クエスト辞退の確認】\n「${t.title}」を辞退しますか？\n\n⚠️ 違約金として ${penalty} pt がマイナスされます。`
+      );
       
-      if (confirm(confirmMsg)) {
+      if (isConfirmed) {
         score -= penalty;
-        alert(`クエストを辞退しました。\n違約金 ${penalty} pt が引き落とされました。`);
         tasks.splice(index, 1);
         updateUI();
+        alert(`クエストを辞退しました。\n違約金 ${penalty} pt を支払いました。`);
       }
     }
 
+    // ④ 撃破（完了）処理
     function completeTask(index) {
       const t = tasks[index];
       const pts = t.time * t.level;
