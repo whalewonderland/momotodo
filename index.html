@@ -89,6 +89,27 @@
 
   </div>
 
+  <!-- カテゴリ変更 モーダル画面 -->
+  <div id="cat-modal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm hidden flex items-center justify-center p-4 z-50">
+    <div class="bg-white rounded-2xl w-full max-w-xs shadow-xl overflow-hidden p-4 space-y-3">
+      <h3 class="font-bold text-xs text-slate-700 text-center">カテゴリを変更を選択</h3>
+      <div class="grid grid-cols-1 gap-2">
+        <button onclick="selectCategory('仕事')" class="w-full bg-slate-100 hover:bg-slate-200 text-slate-800 font-bold py-2.5 rounded-xl text-xs transition">
+          💼 仕事
+        </button>
+        <button onclick="selectCategory('家')" class="w-full bg-indigo-50 hover:bg-indigo-100 text-indigo-700 font-bold py-2.5 rounded-xl text-xs transition">
+          🏠 家
+        </button>
+        <button onclick="selectCategory('自分')" class="w-full bg-teal-50 hover:bg-teal-100 text-teal-700 font-bold py-2.5 rounded-xl text-xs transition">
+          👤 自分
+        </button>
+      </div>
+      <button onclick="closeCategoryModal()" class="w-full text-slate-400 text-xs font-bold py-1">
+        キャンセル
+      </button>
+    </div>
+  </div>
+
   <!-- 討伐リスト モーダル画面 -->
   <div id="history-modal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm hidden flex items-center justify-center p-4 z-50">
     <div class="bg-white rounded-2xl w-full max-w-md max-h-[80vh] flex flex-col shadow-xl overflow-hidden">
@@ -118,6 +139,7 @@
     let score = Number(localStorage.getItem('todo_score') || 0);
     let tasks = JSON.parse(localStorage.getItem('todo_tasks') || '[]');
     let history = JSON.parse(localStorage.getItem('todo_history') || '[]');
+    let currentEditIndex = null;
 
     const levelData = {
       1: { label: 'Lv.1 イフリート', color: 'border-emerald-400', badge: 'bg-emerald-50 text-emerald-700' },
@@ -158,8 +180,8 @@
         card.innerHTML = `
           <div class="space-y-0.5 pr-1 flex-1 min-w-0">
             <div class="flex items-center gap-1">
-              <span onclick="editCategory(${index})" title="タップでカテゴリ変更" class="text-[9px] px-1.5 py-0.2 rounded font-bold cursor-pointer hover:opacity-80 ${catColor}">
-                ${t.cat}
+              <span onclick="openCategoryModal(${index})" title="タップでカテゴリ変更" class="text-[9px] px-1.5 py-0.2 rounded font-bold cursor-pointer hover:opacity-80 active:scale-95 transition ${catColor}">
+                ${t.cat} ▾
               </span>
               <span class="text-[9px] px-1.5 py-0.2 rounded font-medium ${lvl.badge}">${lvl.label}</span>
               <span class="text-[10px] text-slate-400 font-medium">⏱${t.time}分</span>
@@ -217,16 +239,23 @@
       }
     }
 
-    // カテゴリの修正
-    function editCategory(index) {
-      const t = tasks[index];
-      const newCat = window.prompt('カテゴリを変更（仕事 / 家 / 自分）:', t.cat);
-      if (newCat && ['仕事', '家', '自分'].includes(newCat.trim())) {
-        tasks[index].cat = newCat.trim();
+    // カテゴリ選択モーダル処理
+    function openCategoryModal(index) {
+      currentEditIndex = index;
+      document.getElementById('cat-modal').classList.remove('hidden');
+    }
+
+    function closeCategoryModal() {
+      currentEditIndex = null;
+      document.getElementById('cat-modal').classList.add('hidden');
+    }
+
+    function selectCategory(categoryName) {
+      if (currentEditIndex !== null && tasks[currentEditIndex]) {
+        tasks[currentEditIndex].cat = categoryName;
         updateUI();
-      } else if (newCat !== null) {
-        alert('「仕事」「家」「自分」のいずれかを指定してください。');
       }
+      closeCategoryModal();
     }
 
     // 辞退処理（確認ポップアップ ＆ 10%違約金マイナス）
